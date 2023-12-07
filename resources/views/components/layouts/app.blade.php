@@ -18,6 +18,7 @@
     <!-- select plugin -->
     <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Chart.min.css') }}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
 
@@ -26,6 +27,7 @@
     <script src="{{ asset('js/select2.full.min.js') }}" defer></script>
     <script src="{{ asset('js/moment.min.js') }}" defer></script>
     <script src="{{ asset('js/daterangepicker.js') }}" defer></script>
+    <script src="{{ asset('js/Chart.min.js') }}" defer></script>
 
     <script src="{{ asset('js/adminlte.min.js') }}" defer></script>
 </head>
