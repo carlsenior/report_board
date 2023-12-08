@@ -7,6 +7,8 @@ use Livewire\Component;
 class Chart extends Component
 {
     public string $type;
+    public array $labels;
+    public array $data;
 
     public function render()
     {

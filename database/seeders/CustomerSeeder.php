@@ -20,14 +20,14 @@ class CustomerSeeder extends Seeder
         $categories = Category::all()->pluck('id')->toArray();
         $payments = PaymentMethod::all()->pluck('id')->toArray();
         $products = Product::select('id', 'price')->get()->toArray();
-        Customer::factory()->count(8)->create()->each(function ($customer) use ($products, $categories, $payments) {
-            $order_random_count = rand(1, 6);
+        Customer::factory()->count(148)->create()->each(function ($customer) use ($products, $categories, $payments) {
+            $order_random_count = rand(1, 9);
             foreach (range(1, $order_random_count) as $index) {
-                $item_random_count = rand(1, 4);
+                $item_random_count = rand(1, 6);
                 Order::factory()->create([
                     'customer_id' => $customer->id,
                     'payment_method' => fake()->randomElement($payments),
-                    'created_at' => fake()->dateTimeBetween('-1 year', 'now'),
+                    'created_at' => fake()->dateTimeBetween('-2 year', 'now'),
                 ])->each(function ($order) use ($products, $item_random_count, $categories) {
                     foreach (range(1, $item_random_count) as $index) {
                         $product = fake()->randomElement($products);

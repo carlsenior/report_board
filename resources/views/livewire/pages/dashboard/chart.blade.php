@@ -55,7 +55,7 @@
                 <canvas id="chart_{{ $type }}" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
             </div>
             @if($type != 'doughnut')
-                <div class="d-flex flex-row justify-content-end">
+                <div class="d-flex flex-row justify-content-end mt-4">
                       <span class="mr-2">
                         <i class="fas fa-square text-primary"></i> This Week
                       </span>
@@ -80,6 +80,9 @@
 
     const chartCanvas = $('#chart_{{ $type }}').get(0).getContext('2d');
     const chartType = "{{ $type == 'area' ? 'line' : $type }}";
+
+
+
     const chartData = chartType !== 'doughnut' ? {
         labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
         datasets: [
