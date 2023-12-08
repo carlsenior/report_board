@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedTinyInteger('payment_method');
             $table->unsignedBigInteger('customer_id');
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrentOnUpdate();
         });
     }
 

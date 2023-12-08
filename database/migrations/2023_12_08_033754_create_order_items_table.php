@@ -18,7 +18,8 @@ return new class extends Migration
             $table->unsignedSmallInteger('quantity');
             $table->unsignedFloat('price');
             $table->unsignedTinyInteger('discount');
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrentOnUpdate();
         });
     }
 
