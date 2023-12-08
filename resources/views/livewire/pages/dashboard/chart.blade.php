@@ -1,4 +1,4 @@
-<div class="mt-4">
+<div class="mt-4 connectedSortable">
     <div class="card {{$type == 'area' ? 'card-primary' : ($type == 'doughnut' ? 'card-danger' : '') }}">
         @if ($type == 'area')
             <div class="card-header">

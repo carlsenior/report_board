@@ -19,8 +19,8 @@
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
     <script src="{{ asset('js/adminlte.min.js') }}" defer></script>
+
 </head>
 <body class="sidebar-mini layout-fixed">
     <div class="wrapper">
