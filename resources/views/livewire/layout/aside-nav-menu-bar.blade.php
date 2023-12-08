@@ -8,5 +8,5 @@
         <span class="brand-text font-weight-light">{{ config('app.name', 'AdminLTE 3') }}</span>
     </a>
 
-    <livewire:vertical-side-bar />
+    <livewire:nav.vertical-side-bar />
 </aside>

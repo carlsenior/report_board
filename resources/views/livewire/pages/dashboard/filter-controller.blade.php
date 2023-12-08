@@ -30,6 +30,15 @@
     </div>
 </div>
 
+@assets
+<!-- select plugin -->
+<link rel="stylesheet" href="{{ asset('css/select2.min.css') }}">
+<link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}">
+
+<script src="{{ asset('js/select2.full.min.js') }}" defer></script>
+<script src="{{ asset('js/moment.min.js') }}" defer></script>
+<script src="{{ asset('js/daterangepicker.js') }}" defer></script>
+@endassets
 
 
 @script

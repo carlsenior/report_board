@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\DashBoard\DashBoardPage;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,7 +19,7 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 })->name('index');
 
-Route::get('dashboard', \App\Livewire\DashBoardPage::class)
+Route::get('dashboard', DashBoardPage::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\DashBoard\Chart;
 
 use Livewire\Component;
 
@@ -10,6 +10,6 @@ class Chart extends Component
 
     public function render()
     {
-        return view('livewire.chart');
+        return view('livewire.pages.dashboard.chart');
     }
 }

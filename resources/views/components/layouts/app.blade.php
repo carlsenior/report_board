@@ -15,19 +15,10 @@
     <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}">
     <!-- icheck bootstrap -->
     <link rel="stylesheet" href="{{ asset('css/icheck-bootstrap.min.css') }}">
-    <!-- select plugin -->
-    <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/Chart.min.css') }}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <script src="{{ asset('js/select2.full.min.js') }}" defer></script>
-    <script src="{{ asset('js/moment.min.js') }}" defer></script>
-    <script src="{{ asset('js/daterangepicker.js') }}" defer></script>
-    <script src="{{ asset('js/Chart.min.js') }}" defer></script>
 
     <script src="{{ asset('js/adminlte.min.js') }}" defer></script>
 </head>
@@ -35,7 +26,7 @@
     <div class="wrapper">
 
         <livewire:layout.navigation />
-        <livewire:layout.aside-nav-menu-bar />
+        <livewire:nav.aside-nav-menu-bar />
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -46,7 +37,7 @@
         </div>
         <!-- /.content-wrapper -->
 
-        <livewire:control-bar />
+        <livewire:nav.control-bar />
 
         <!-- Main Footer -->
         <footer class="main-footer">

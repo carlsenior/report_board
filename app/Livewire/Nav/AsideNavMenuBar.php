@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Nav;
 
 use Livewire\Component;
 
@@ -8,6 +8,6 @@ class AsideNavMenuBar extends Component
 {
     public function render()
     {
-        return view('livewire.layouts.aside-nav-menu-bar');
+        return view('livewire.layout.aside-nav-menu-bar');
     }
 }

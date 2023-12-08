@@ -10,7 +10,7 @@
                 <a href="{{ route('dashboard') }}" class="nav-link" wire:navigate>
                     <i class="nav-icon fas fa-th"></i>
                     <p>
-                        {{ __('Dashboard') }}
+                        {{ __('DashBoard') }}
                     </p>
                 </a>
             </li>
