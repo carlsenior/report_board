@@ -27,6 +27,7 @@ class CustomerSeeder extends Seeder
                 Order::factory()->create([
                     'customer_id' => $customer->id,
                     'payment_method' => fake()->randomElement($payments),
+                    'created_at' => fake()->dateTimeBetween('-1 year', 'now'),
                 ])->each(function ($order) use ($products, $item_random_count, $categories) {
                     foreach (range(1, $item_random_count) as $index) {
                         $product = fake()->randomElement($products);
@@ -36,6 +37,7 @@ class CustomerSeeder extends Seeder
                             'price' => $product['price'],
                             'quantity' => rand(1, 10),
                             'discount' => rand(0, 15),
+                            'created_at' => $order->created_at,
                         ]);
                     }
                 });
