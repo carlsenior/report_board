@@ -4,9 +4,9 @@
         <select class="select2" style="width: 100%;"
                 multiple
                 data-select2-id="1" tabindex="1" aria-hidden="true">
-            <option>Text only</option>
-            <option>Images</option>
-            <option>Video</option>
+            @foreach($categories as $index => $category)
+                <option value="{{ $category['id'] }}">{{ $category['name'] }}</option>
+            @endforeach
         </select>
     </div>
 
@@ -15,9 +15,9 @@
         <select class="select2" style="width: 100%;"
                 multiple
                 data-select2-id="2" tabindex="2" aria-hidden="true">
-            <option>Text only</option>
-            <option>Images</option>
-            <option>Video</option>
+            @foreach($products as $index => $product)
+                <option value="{{ $product['id'] }}">{{ $product['name'] }}</option>
+            @endforeach
         </select>
     </div>
 
