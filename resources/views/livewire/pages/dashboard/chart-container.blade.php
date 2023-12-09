@@ -6,7 +6,7 @@
         </div>
         <div class="col-sm-6">
             <livewire:dash-board.chart.chart type="bar" :datasource="$dataSource['sales']" />
-            <livewire:dash-board.report />
+            <livewire:dash-board.report :datasource="$dataSource['report']"/>
         </div>
     </div>
 </div>

@@ -36,6 +36,11 @@ class ChartContainer extends Component
 
         # this is the data source of the donut chart - filter by category
         $this->dataSource['categories'] =  $this->getProfitByCategory($startDate, $endDate);
+
+        # this is the data source of the report
+        $this_year_per_product = $this->getReportData($startDate, $endDate);
+        $last_year_per_product = $this->getReportData($last_startDate, $last_endDate);
+        $this->dataSource['report'] = [$this_year_per_product, $last_year_per_product];
     }
 
     private function getDataSource($this_year_data, $last_year_data): array {
@@ -156,14 +161,14 @@ class ChartContainer extends Component
             ", [$startDate, $endDate]))
             ->pluck('total', 'name')
             ->toArray();
+    }
 
-//        return OrderItem::whereBetween('created_at', [$startDate, $endDate])
-//            ->selectRaw('product_id, DATE_FORMAT(created_at, "%Y-%m-%d") as created, SUM(quantity * price * (100-discount)/100) as order_item_total_price')
-//            ->groupBy('created')
-//            ->orderBy('created')
-//            ->toSql();
-//            ->get()
-//            ->pluck('order_item_total_price', 'created')
-//            ->toArray();
+    private function getReportData(string $startDate, string $endDate)
+    {
+        return DB::select("SELECT sum(items.quantity) as quantities, sum(items.item_total) as sales, products.`name` as `name`, MAX(products.price) as price from (SELECT product_id, quantity, quantity * price * (100-discount)/100 as item_total, DATE_FORMAT(created_at, '%Y-%m-%d') as created
+            from order_items
+            WHERE created_at BETWEEN ? and ?) as items
+            JOIN products on products.id = items.product_id
+            GROUP BY `name`;", [$startDate, $endDate]);
     }
 }

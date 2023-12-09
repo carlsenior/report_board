@@ -1,3 +1,8 @@
 .connectedSortable {
     min-height: 0px !important;
 }
+
+#overlay_scroll {
+    max-height: 400px !important;
+    overflow: auto;
+}
