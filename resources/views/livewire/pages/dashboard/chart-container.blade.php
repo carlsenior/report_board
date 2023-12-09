@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-sm-6">
             <livewire:dash-board.chart.chart type="area" :datasource="$dataSource['visitors']" />
-            <livewire:dash-board.chart.chart type="doughnut" :datasource="$dataSource['sales']" />
+            <livewire:dash-board.chart.chart type="doughnut" :datasource="$dataSource['categories']" />
         </div>
         <div class="col-sm-6">
             <livewire:dash-board.chart.chart type="bar" :datasource="$dataSource['sales']" />

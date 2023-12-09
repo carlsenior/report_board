@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class ChartContainer extends Component
@@ -25,7 +26,6 @@ class ChartContainer extends Component
         # this is the data source of the barchart - sales
         $this_year_profit = $this->getTotalProfitByOrderItems($startDate, $endDate);
         $last_year_profit = $this->getTotalProfitByOrderItems($last_startDate, $last_endDate);
-
         $this->dataSource['sales'] = $this->getDataSource($this_year_profit, $last_year_profit);
 
         # this is the data source of the area chart - visitors
@@ -35,8 +35,7 @@ class ChartContainer extends Component
         $this->dataSource['visitors'] = $this->getDataSource($this_year_visitors, $last_year_visitors);
 
         # this is the data source of the donut chart - filter by category
-
-//        dd($this_year_profit);
+        $this->dataSource['categories'] =  $this->getProfitByCategory($startDate, $endDate);
     }
 
     private function getDataSource($this_year_data, $last_year_data): array {
@@ -48,7 +47,7 @@ class ChartContainer extends Component
         ksort($this_year_data);
         ksort($last_year_data);
 
-        #summay
+        #summay for total
         $this_year_total = $this->getTotalSummary($this_year_data);
         $last_year_total = $this->getTotalSummary($last_year_data);
 
@@ -71,16 +70,14 @@ class ChartContainer extends Component
      * @param string $endDate
      * @return mixed
      */
-    public function getTotalProfitByOrderItems(string $startDate, string $endDate): array
+    public function getTotalProfitByOrderItems(string $startDate, string $endDate): mixed
     {
         return OrderItem::whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw('id, product_id, order_id, DATE_FORMAT(created_at, "%Y-%m-%d") as created, quantity * price * (100-discount)/100 as order_item_total_price')
+            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d") as created, SUM(quantity * price * (100-discount)/100) as order_item_total_price')
+            ->groupBy('created')
             ->orderBy('created')
             ->get()
-            ->groupBy('created')
-            ->map(function ($items) {
-                return round($items->sum('order_item_total_price'), 2);
-            })
+            ->pluck('order_item_total_price', 'created')
             ->toArray();
     }
 
@@ -130,14 +127,11 @@ class ChartContainer extends Component
     private function getVistorsByOrders(string $startDate, string $endDate)
     {
          return Order::whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw('customer_id, DATE_FORMAT(created_at, "%Y-%m-%d") as created, 1 as count')
-            ->orderBy('created')
-            ->with('owner')
-            ->get()
+            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d") as created, COUNT(*) as count')
             ->groupBy('created')
-            ->map(function ($items) {
-                return $items->sum('count');
-            })
+            ->orderBy('created')
+            ->get()
+            ->pluck('count', 'created')
             ->toarray();
     }
 
@@ -150,5 +144,26 @@ class ChartContainer extends Component
         return array_reduce($array, function ($carry, $item) {
             return $carry + $item;
         });
+    }
+
+    private function getProfitByCategory(string $startDate, string $endDate): mixed
+    {
+        return collect(DB::select("SELECT ROUND(SUM(citems.item_total),2) as total, `name` FROM (SELECT pitems.p_id, pitems.order_item_total_price as item_total, pitems.created, pitems.category_id FROM (SELECT * FROM (SELECT product_id AS p_id, DATE_FORMAT(created_at, '%Y-%m-%d') as created, quantity * price * (100-discount)/100 as order_item_total_price
+            from `order_items` where `created_at` between ? and ?) as items
+            left join products on items.p_id = products.id) as pitems) as citems
+            left join categories on categories.id = citems.category_id
+            GROUP BY name;
+            ", [$startDate, $endDate]))
+            ->pluck('total', 'name')
+            ->toArray();
+
+//        return OrderItem::whereBetween('created_at', [$startDate, $endDate])
+//            ->selectRaw('product_id, DATE_FORMAT(created_at, "%Y-%m-%d") as created, SUM(quantity * price * (100-discount)/100) as order_item_total_price')
+//            ->groupBy('created')
+//            ->orderBy('created')
+//            ->toSql();
+//            ->get()
+//            ->pluck('order_item_total_price', 'created')
+//            ->toArray();
     }
 }
