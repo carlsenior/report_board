@@ -16,14 +16,14 @@ class Order extends Model
     ];
 
     public function owner(): BelongsTo {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 
     public function payment(): BelongsTo {
-        return $this->belongsTo(PaymentMethod::class);
+        return $this->belongsTo(PaymentMethod::class, 'payment_id');
     }
 
     public function orderItems(): HasMany {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(OrderItem::class, 'order_id');
     }
 }

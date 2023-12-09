@@ -16,11 +16,11 @@ class Customer extends Model
     ];
 
     public function orders(): HasMany {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Order::class, 'customer_id');
     }
 
     public function orderItems(): HasManyThrough
     {
-        return $this->hasManyThrough(OrderItem::class, Order::class);
+        return $this->hasManyThrough(OrderItem::class, Order::class, 'customer_id', 'order_id', 'id', 'id');
     }
 }

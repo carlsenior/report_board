@@ -17,10 +17,10 @@ class Category extends Model
     ];
 
     public function products(): HasMany {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Product::class, 'category_id');
     }
 
     public function orderItems(): HasManyThrough {
-        return $this->hasManyThrough(OrderItem::class, Product::class);
+        return $this->hasManyThrough(OrderItem::class, Product::class, 'category_id', 'product_id', 'id', 'id');
     }
 }

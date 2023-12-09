@@ -1,11 +1,11 @@
 <div>
     <div class="row">
         <div class="col-sm-6">
-            <livewire:dash-board.chart.chart type="area" :labels="$labels" :data="$data" />
-            <livewire:dash-board.chart.chart type="doughnut" :labels="$labels" :data="$data" />
+            <livewire:dash-board.chart.chart type="area" :datasource="$dataSource['visitors']" />
+            <livewire:dash-board.chart.chart type="doughnut" :datasource="$dataSource['sales']" />
         </div>
         <div class="col-sm-6">
-            <livewire:dash-board.chart.chart type="bar" :labels="$labels" :data="$data" />
+            <livewire:dash-board.chart.chart type="bar" :datasource="$dataSource['sales']" />
             <livewire:dash-board.report />
         </div>
     </div>

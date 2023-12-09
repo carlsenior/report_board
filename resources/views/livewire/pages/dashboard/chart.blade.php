@@ -16,7 +16,7 @@
         @elseif($type == 'bar')
             <div class="card-header border-0">
                 <div class="d-flex justify-content-between">
-                    <h3 class="card-title">Online Store Visitors</h3>
+                    <h3 class="card-title">Online Store Sales</h3>
                     <a href="javascript:void(0);">View Report</a>
                 </div>
             </div>
@@ -38,14 +38,33 @@
             @if ($type == 'bar')
                 <div class="d-flex">
                     <p class="d-flex flex-column">
-                        <span class="text-bold text-lg">820</span>
+                        <span class="text-bold text-lg">${{ number_format($datasource['total'][0], 2, '.', ',') }}</span>
+                        <span>Sales Over Time</span>
+                    </p>
+                    <p class="ml-auto d-flex flex-column text-right">
+                    @php
+                        $rate = round(($datasource['total'][0] / $datasource['total'][1]-1) * 100, 1)
+                    @endphp
+                    <span class="{{$rate >= 0 ? 'text-success' : 'text-danger' }}">
+                      <i class="fas {{$rate >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i> {{ $rate }}%
+                    </span>
+                        <span class="text-muted">Since last year</span>
+                    </p>
+                </div>
+            @elseif($type == 'area')
+                <div class="d-flex">
+                    <p class="d-flex flex-column">
+                        <span class="text-bold text-lg">{{ $datasource['total'][0] }}</span>
                         <span>Visitors Over Time</span>
                     </p>
                     <p class="ml-auto d-flex flex-column text-right">
-                        <span class="text-success">
-                          <i class="fas fa-arrow-up"></i> 12.5%
-                        </span>
-                        <span class="text-muted">Since last week</span>
+                     @php
+                        $rate = round(($datasource['total'][0] / $datasource['total'][1]-1) * 100, 1);
+                     @endphp
+                    <span class="{{$rate >= 0 ? 'text-success' : 'text-danger' }}">
+                      <i class="fas {{ $rate >= 0 ? 'fa-arrow-up' : "fa-arrow-down" }}"></i> {{ $rate }}%
+                    </span>
+                        <span class="text-muted">Since last year</span>
                     </p>
                 </div>
             @endif
@@ -57,11 +76,11 @@
             @if($type != 'doughnut')
                 <div class="d-flex flex-row justify-content-end mt-4">
                       <span class="mr-2">
-                        <i class="fas fa-square text-primary"></i> This Week
+                        <i class="fas fa-square text-primary"></i> This Year
                       </span>
 
                     <span>
-                        <i class="fas fa-square text-gray"></i> Last Week
+                        <i class="fas fa-square text-gray"></i> Last Year
                       </span>
                 </div>
             @endif
@@ -78,53 +97,140 @@
 @script
 <script defer>
 
+    const _chat_type = @js($type);
+    const _data_source = @js($datasource);
+
+    const _month_name = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+        'October', 'November', 'December'];
+
     const chartCanvas = $('#chart_{{ $type }}').get(0).getContext('2d');
-    const chartType = "{{ $type == 'area' ? 'line' : $type }}";
+    const chartType = _chat_type === 'area' ? 'line' : _chat_type;
 
+    let chartData;
 
-
-    const chartData = chartType !== 'doughnut' ? {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-        datasets: [
-            {
-                label: 'Digital Goods',
-                backgroundColor: 'rgba(60,141,188,0.9)',
-                borderColor: 'rgba(60,141,188,0.8)',
-                pointRadius: false,
-                pointColor: '#3b8bba',
-                pointStrokeColor: 'rgba(60,141,188,1)',
-                pointHighlightFill: '#fff',
-                pointHighlightStroke: 'rgba(60,141,188,1)',
-                data: [28, 48, 40, 19, 86, 27, 90]
-            },
-            {
-                label: 'Electronics',
-                backgroundColor: 'rgba(210, 214, 222, 1)',
-                borderColor: 'rgba(210, 214, 222, 1)',
-                pointRadius: false,
-                pointColor: 'rgba(210, 214, 222, 1)',
-                pointStrokeColor: '#c1c7d1',
-                pointHighlightFill: '#fff',
-                pointHighlightStroke: 'rgba(220,220,220,1)',
-                data: [65, 59, 80, 81, 56, 55, 40]
-            },
-        ]
-    } : {
-        labels: [
-            'Chrome',
-            'IE',
-            'FireFox',
-            'Safari',
-            'Opera',
-            'Navigator',
-        ],
-        datasets: [
-            {
-                data: [700,500,400,600,300,100],
-                backgroundColor : ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
+    switch (chartType) {
+        case 'line':
+            chartData = {
+                labels: _data_source['labels'],
+                datasets: [
+                    {
+                        label: 'This Year Visitors',
+                        backgroundColor: 'rgba(60,141,188,0.9)',
+                        borderColor: 'rgba(60,141,188,0.8)',
+                        pointRadius: true,
+                        pointColor: '#3b8bba',
+                        pointStrokeColor: 'rgba(60,141,188,1)',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(60,141,188,1)',
+                        data: _data_source['data'][0]
+                    },
+                    {
+                        label: 'Last Year Profit',
+                        backgroundColor: 'rgba(210, 214, 222, 1)',
+                        borderColor: 'rgba(210, 214, 222, 1)',
+                        pointRadius: true,
+                        pointColor: 'rgba(210, 214, 222, 1)',
+                        pointStrokeColor: '#c1c7d1',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(220,220,220,1)',
+                        data: _data_source['data'][1]
+                    },
+                ]
             }
-        ]
-    };
+            break;
+        case 'bar':
+            chartData = {
+                labels: _data_source['labels'],
+                datasets: [
+                    {
+                        label: 'This Year Profit',
+                        backgroundColor: 'rgba(60,141,188,0.9)',
+                        borderColor: 'rgba(60,141,188,0.8)',
+                        pointRadius: true,
+                        pointColor: '#3b8bba',
+                        pointStrokeColor: 'rgba(60,141,188,1)',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(60,141,188,1)',
+                        data: _data_source['data'][0]
+                    },
+                    {
+                        label: 'Last Year Profit',
+                        backgroundColor: 'rgba(210, 214, 222, 1)',
+                        borderColor: 'rgba(210, 214, 222, 1)',
+                        pointRadius: true,
+                        pointColor: 'rgba(210, 214, 222, 1)',
+                        pointStrokeColor: '#c1c7d1',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(220,220,220,1)',
+                        data: _data_source['data'][1]
+                    },
+                ]
+            }
+            break;
+        case 'doughnut':
+            chartData = {
+                    labels: [
+                        'Chrome',
+                        'IE',
+                        'FireFox',
+                        'Safari',
+                        'Opera',
+                        'Navigator',
+                    ],
+                    datasets: [
+                        {
+                            data: [700,500,400,600,300,100],
+                            backgroundColor : ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
+                        }
+                    ]
+                };
+            break;
+    }
+
+    //
+    //
+    // const chartData = chartType !== 'doughnut' ? {
+    //     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    //     datasets: [
+    //         {
+    //             label: 'Digital Goods',
+    //             backgroundColor: 'rgba(60,141,188,0.9)',
+    //             borderColor: 'rgba(60,141,188,0.8)',
+    //             pointRadius: false,
+    //             pointColor: '#3b8bba',
+    //             pointStrokeColor: 'rgba(60,141,188,1)',
+    //             pointHighlightFill: '#fff',
+    //             pointHighlightStroke: 'rgba(60,141,188,1)',
+    //             data: [28, 48, 40, 19, 86, 27, 90]
+    //         },
+    //         {
+    //             label: 'Electronics',
+    //             backgroundColor: 'rgba(210, 214, 222, 1)',
+    //             borderColor: 'rgba(210, 214, 222, 1)',
+    //             pointRadius: false,
+    //             pointColor: 'rgba(210, 214, 222, 1)',
+    //             pointStrokeColor: '#c1c7d1',
+    //             pointHighlightFill: '#fff',
+    //             pointHighlightStroke: 'rgba(220,220,220,1)',
+    //             data: [65, 59, 80, 81, 56, 55, 40]
+    //         },
+    //     ]
+    // } : {
+    //     labels: [
+    //         'Chrome',
+    //         'IE',
+    //         'FireFox',
+    //         'Safari',
+    //         'Opera',
+    //         'Navigator',
+    //     ],
+    //     datasets: [
+    //         {
+    //             data: [700,500,400,600,300,100],
+    //             backgroundColor : ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
+    //         }
+    //     ]
+    // };
 
     let chartOptions = chartType !== 'doughnut' ? {
         maintainAspectRatio: false,
@@ -140,9 +246,12 @@
             }],
             yAxes: [{
                 gridLines: {
-                    display: false,
+                    display: true,
+                },
+                ticks: {
+                    precision: 0
                 }
-            }]
+            }],
         }
 
     } : {
