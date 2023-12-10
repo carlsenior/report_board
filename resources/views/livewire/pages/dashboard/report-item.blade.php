@@ -11,7 +11,7 @@
             @else
                 <i class="fas fa-arrow-down"></i>
             @endif
-            {{ $last_data['sales'] == 0 ? 100 : ($last_data['sales'] <= $this_data['sales'] ? round(($this_data['sales']/$last_data['sales']-1)*100) : round((1 - $this_data['sales']/$last_data['sales'])*100)) }}%
+            {{ $last_data['sales'] == 0 ? ($this_data['sales'] == 0 ? 0 : 100) : ($last_data['sales'] <= $this_data['sales'] ? round(($this_data['sales']/$last_data['sales']-1)*100) : round((1 - $this_data['sales']/$last_data['sales'])*100)) }}%
         </small>
         {{ number_format($this_data['sales'], 2, '.', ',') }}
     </td>

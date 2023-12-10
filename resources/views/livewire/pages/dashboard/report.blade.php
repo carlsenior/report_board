@@ -26,9 +26,18 @@
                     <tbody>
 
                     @forelse($datasource[0] as $index => $data)
-                        <livewire:dash-board.report-item :this_data="$data" :last_data="$datasource[1][$index]" :key="$index"/>
+                        @php
+                        $_last_datas = array_filter($datasource[1], function ($value) use ($data) {
+                            return $value['id'] == $data['id'];
+                        });
+                        $last_data = count($_last_datas) == 1 ? array_values($_last_datas)[0] : [
+                            'sales' => 0
+                        ];
+
+                        @endphp
+                        <livewire:dash-board.report-item :this_data="$data" :last_data="$last_data" key="$index" />
                     @empty
-                        <p>No products</p>
+                        <p class="no-product">No products</p>
                     @endforelse
 
                     </tbody>

@@ -54,7 +54,8 @@
         const state = {
             filter: FILTER_TYPE.last30days,
             categories: [],
-            products: []
+            products: [],
+            dates: []
         }
 
         function cb(start, end) {
@@ -72,7 +73,31 @@
                 'This Month': [moment().startOf('month'), moment().endOf('month')],
                 'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
             }
-        }, cb);
+        }, cb).on('apply.daterangepicker', function (ev, picker) {
+            start_date = moment(picker.startDate._d).format('YYYY-MM-DD');
+            end_date = moment(picker.endDate._d).format('YYYY-MM-DD');
+            today = moment().format('YYYY-MM-DD');
+
+            if (start_date == end_date && start_date == today) {
+                state.filter = FILTER_TYPE.today;
+            } else if (start_date == end_date && start_date == moment().subtract(1, 'days').format('YYYY-MM-DD')) {
+                state.filter = FILTER_TYPE.yesterday;
+            } else if (start_date == moment().subtract(6, 'days').format('YYYY-MM-DD') && end_date == moment().format('YYYY-MM-DD')) {
+                state.filter = FILTER_TYPE.last7days;
+            } else if (start_date == moment().subtract(29, 'days').format('YYYY-MM-DD') && end_date == moment().format('YYYY-MM-DD')) {
+                state.filter = FILTER_TYPE.last30days;
+            } else if (start_date == moment().startOf('month').format('YYYY-MM-DD') && end_date == moment().endOf('month').format('YYYY-MM-DD')) {
+                state.filter = FILTER_TYPE.thismonth;
+            } else if (start_date == moment().subtract(1, 'month').startOf('month').format('YYYY-MM-DD') && end_date == moment().subtract(1, 'month').endOf('month').format('YYYY-MM-DD')) {
+                state.filter = FILTER_TYPE.lastmonth;
+            } else {
+                state.filter = FILTER_TYPE.custom;
+                state.dates = [start_date, end_date]
+            }
+            $wire.dispatchTo('dash-board.chart.chart-container', 'dofilter', {
+                state
+            })
+        });
         cb(start, end);
 
         // multi select

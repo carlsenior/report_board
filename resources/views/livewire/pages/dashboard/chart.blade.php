@@ -43,10 +43,10 @@
                     </p>
                     <p class="ml-auto d-flex flex-column text-right">
                     @php
-                        $rate = round(($datasource['total'][0] / $datasource['total'][1]-1) * 100, 1)
+                        $rate = $datasource['total'][1] == 0 ? ($datasource['total'][0] == 0 ? 0 : 100) : round(($datasource['total'][0] / $datasource['total'][1]-1) * 100, 1)
                     @endphp
                     <span class="{{$rate >= 0 ? 'text-success' : 'text-danger' }}">
-                      <i class="fas {{$rate >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i> {{ $rate }}%
+                      <i class="fas {{$rate >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i> {{ abs($rate) }}%
                     </span>
                         <span class="text-muted">Since last year</span>
                     </p>
@@ -59,14 +59,18 @@
                     </p>
                     <p class="ml-auto d-flex flex-column text-right">
                      @php
-                        $rate = round(($datasource['total'][0] / $datasource['total'][1]-1) * 100, 1);
+                        $rate = $datasource['total'][1] == 0 ? ($datasource['total'][0] == 0 ? 0 : 100) : round(($datasource['total'][0] / $datasource['total'][1]-1) * 100, 1);
                      @endphp
                     <span class="{{$rate >= 0 ? 'text-success' : 'text-danger' }}">
-                      <i class="fas {{ $rate >= 0 ? 'fa-arrow-up' : "fa-arrow-down" }}"></i> {{ $rate }}%
+                      <i class="fas {{ $rate >= 0 ? 'fa-arrow-up' : "fa-arrow-down" }}"></i> {{ abs($rate) }}%
                     </span>
                         <span class="text-muted">Since last year</span>
                     </p>
                 </div>
+            @else
+                <p class="d-flex flex-column">
+                    <span>Sales per Category</span>
+                </p>
             @endif
             <!-- /.d-flex -->
 

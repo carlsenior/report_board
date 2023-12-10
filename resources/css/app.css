@@ -6,3 +6,7 @@
     max-height: 400px !important;
     overflow: auto;
 }
+
+.no-product {
+    text-align: center;
+}

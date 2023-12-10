@@ -15,7 +15,6 @@ class Chart extends Component
 
     public function render()
     {
-        Log::info('Chart render');
         return view('livewire.pages.dashboard.chart');
     }
 }
