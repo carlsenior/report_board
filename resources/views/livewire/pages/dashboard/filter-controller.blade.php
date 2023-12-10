@@ -108,32 +108,52 @@
             $wire.dispatchTo('dash-board.chart.chart-container', 'dofilter', {
                 state
             });
-            // console.log($wire);
 
-            // $(".select2_2").empty();
-            // $('.select2_2').select2({
-            //     theme: 'classic',
-            //     data: product_select_data
-            // })
+            $(".select2_2").empty();
+            $('.select2_2').select2({
+                theme: 'classic',
+                data: product_select_data
+            })
         }).on('select2:unselect', function (e) {
-            // const category_id = e.params.data.id;
-            // const categories = category_select_data.filter(c => c.id === parseInt(category_id, 10));
-            // categories[0].products.forEach(function (product) {
-            //     product_select_data.pop({
-            //         id: product.id,
-            //         text: product.name
-            //     })
-            // });
-            // $(".select2_2").empty();
-            // $('.select2_2').select2({
-            //     theme: 'classic',
-            //     data: product_select_data
-            // })
+            const category_id = e.params.data.id;
+            const categories = category_select_data.filter(c => c.id === parseInt(category_id, 10));
+            categories[0].products.forEach(function (product) {
+                product_select_data.pop({
+                    id: product.id,
+                    text: product.name
+                })
+            });
+
+            selected_categories = [];
+            $(this).find(':selected').each(function () {
+                selected_categories.push($(this).val());
+            })
+            state.categories = selected_categories;
+            state.products = [];
+
+            $wire.dispatchTo('dash-board.chart.chart-container', 'dofilter', {
+                state
+            });
+
+            $(".select2_2").empty();
+            $('.select2_2').select2({
+                theme: 'classic',
+                data: product_select_data
+            })
         });
 
         $('.select2_2').select2({
                 theme: 'classic',
-        })
+        }).on('select2:select select2:unselect', function (e) {
+            selected_products = [];
+            $(this).find(':selected').each(function () {
+                selected_products.push($(this).val());
+            })
+            state.products = selected_products;
+            $wire.dispatchTo('dash-board.chart.chart-container', 'dofilter', {
+                state
+            })
+        });
     })
 </script>
 @endscript

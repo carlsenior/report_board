@@ -1,12 +1,12 @@
 <div>
     <div class="row">
         <div class="col-sm-6">
-            <livewire:dash-board.chart.chart type="area" :datasource="$dataSource['visitors']" />
-            <livewire:dash-board.chart.chart type="doughnut" :datasource="$dataSource['categories']"/>
+            <livewire:dash-board.chart.chart key="{{ now() }}" type="area" :datasource="$dataSource['visitors']" />
+            <livewire:dash-board.chart.chart key="{{ now() }}" type="doughnut" :datasource="$dataSource['categories']"/>
         </div>
         <div class="col-sm-6">
-            <livewire:dash-board.chart.chart type="bar" :datasource="$dataSource['sales']" />
-            <livewire:dash-board.report :datasource="$dataSource['report']"/>
+            <livewire:dash-board.chart.chart key="{{ now() }}" type="bar" :datasource="$dataSource['sales']" />
+            <livewire:dash-board.report key="{{ now() }}" :datasource="$dataSource['report']"/>
         </div>
     </div>
 </div>
@@ -26,5 +26,7 @@
         zIndex: 999999
     })
     $('.connectedSortable .card-header').css('cursor', 'move')
+
+
 </script>
 @endscript

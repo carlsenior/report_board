@@ -28,7 +28,7 @@ class ChartContainer extends Component
         $_selected_products = $state['products'];
 
         $this->dataSource = $this->getDataSourceFromDB($_filter_type, $_selected_categories, $_selected_products);
-        $this->dispatch('content_changed');
+        $this->dispatch('content_changed', $this->dataSource);
     }
 
     private function getDataSourceFromDB($filter_type, $categories=[], $products=[], $start_date=null, $end_date=null, $last_start_date=null, $last_end_date=null): array
@@ -256,7 +256,7 @@ class ChartContainer extends Component
             ->get()
             ->groupBy('category.name')
             ->map(function ($item) {
-                return $item->sum('item_total');
+                return round($item->sum('item_total'), 2);
             })->toArray();
     }
 

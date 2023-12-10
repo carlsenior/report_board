@@ -11,7 +11,6 @@ class Chart extends Component
 {
     public string $type;
 
-    #[Reactive]
     public array $datasource;
 
     public function render()

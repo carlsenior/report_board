@@ -96,94 +96,10 @@
 
 @script
 <script defer>
-
-
     $(document).ready(() => {
 
-        function buildChart(chartType, _data_source, chartCanvas) {
-            let chartData;
-
-            switch (chartType) {
-                case 'line':
-                case 'bar':
-                    chartData = {
-                        labels: _data_source['labels'],
-                        datasets: [
-                            {
-                                label: 'This Year Visitors',
-                                backgroundColor: 'rgba(60,141,188,0.9)',
-                                borderColor: 'rgba(60,141,188,0.8)',
-                                pointRadius: true,
-                                pointColor: '#3b8bba',
-                                pointStrokeColor: 'rgba(60,141,188,1)',
-                                pointHighlightFill: '#fff',
-                                pointHighlightStroke: 'rgba(60,141,188,1)',
-                                data: _data_source['data'][0]
-                            },
-                            {
-                                label: 'Last Year Profit',
-                                backgroundColor: 'rgba(210, 214, 222, 1)',
-                                borderColor: 'rgba(210, 214, 222, 1)',
-                                pointRadius: true,
-                                pointColor: 'rgba(210, 214, 222, 1)',
-                                pointStrokeColor: '#c1c7d1',
-                                pointHighlightFill: '#fff',
-                                pointHighlightStroke: 'rgba(220,220,220,1)',
-                                data: _data_source['data'][1]
-                            },
-                        ]
-                    }
-                    break;
-                case 'doughnut':
-                    chartData = {
-                        labels: Object.keys(_data_source),
-                        datasets: [
-                            {
-                                data: Object.values(_data_source),
-                                backgroundColor : _back_colors.slice(0, Object.values(_data_source).length),
-                            }
-                        ]
-                    };
-                    break;
-            }
-
-
-            let chartOptions = chartType !== 'doughnut' ? {
-                maintainAspectRatio: false,
-                responsive: true,
-                legend: {
-                    display: false
-                },
-                scales: {
-                    xAxes: [{
-                        gridLines: {
-                            display: false,
-                        }
-                    }],
-                    yAxes: [{
-                        gridLines: {
-                            display: true,
-                        },
-                        ticks: {
-                            precision: 0
-                        }
-                    }],
-                }
-
-            } : {
-                maintainAspectRatio: false,
-                responsive: true,
-            };
-
-            // This will get the first returned node in the jQuery collection.
-            return new Chart(chartCanvas, {
-                type:  chartType,
-                data: chartData,
-                options: chartOptions
-            })
-        }
         const _chat_type = @js($type);
-        const _data_source = @js($datasource);
+        let _data_source = @js($datasource);
         const _back_colors = ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#6200EE', '#03DAC6', '#d2d6de'];
 
         const _month_name = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
@@ -191,28 +107,87 @@
 
         const chartCanvas = $('#chart_{{ $type }}').get(0).getContext('2d');
         const chartType = _chat_type === 'area' ? 'line' : _chat_type;
-        chart = buildChart(chartType, _data_source, chartCanvas);
-        {{--window.addEventListener('content_changed', e => {--}}
-        {{--    const _data_source = @js($datasource);--}}
-        {{--    console.log(_data_source);--}}
-        {{--    if (chart != null) {--}}
-        {{--        if (_chat_type !== 'doughnut') {--}}
-        {{--            chart.data.labels = _data_source['labels'];--}}
-        {{--            chart.data.datasets[0].data = _data_source['data'][0];--}}
-        {{--            chart.data.datasets[1].data = _data_source['data'][1];--}}
-        {{--        } else {--}}
-        {{--            console.log(_data_source);--}}
-        {{--            chart.data.labels = Object.keys(_data_source);--}}
-        {{--            chart.data.datasets = [--}}
-        {{--                {--}}
-        {{--                    data: Object.values(_data_source),--}}
-        {{--                    backgroundColor : _back_colors.slice(0, Object.values(_data_source).length),--}}
-        {{--                }--}}
-        {{--            ]--}}
-        {{--        }--}}
-        {{--        chart.update('none');--}}
-        {{--    }--}}
-        {{--})--}}
+
+        let chartData;
+
+        switch (chartType) {
+            case 'line':
+            case 'bar':
+                chartData = {
+                    labels: _data_source['labels'],
+                    datasets: [
+                        {
+                            label: 'This Year Visitors',
+                            backgroundColor: 'rgba(60,141,188,0.9)',
+                            borderColor: 'rgba(60,141,188,0.8)',
+                            pointRadius: true,
+                            pointColor: '#3b8bba',
+                            pointStrokeColor: 'rgba(60,141,188,1)',
+                            pointHighlightFill: '#fff',
+                            pointHighlightStroke: 'rgba(60,141,188,1)',
+                            data: _data_source['data'][0]
+                        },
+                        {
+                            label: 'Last Year Profit',
+                            backgroundColor: 'rgba(210, 214, 222, 1)',
+                            borderColor: 'rgba(210, 214, 222, 1)',
+                            pointRadius: true,
+                            pointColor: 'rgba(210, 214, 222, 1)',
+                            pointStrokeColor: '#c1c7d1',
+                            pointHighlightFill: '#fff',
+                            pointHighlightStroke: 'rgba(220,220,220,1)',
+                            data: _data_source['data'][1]
+                        },
+                    ]
+                }
+                break;
+            case 'doughnut':
+                chartData = {
+                    labels: Object.keys(_data_source),
+                    datasets: [
+                        {
+                            data: Object.values(_data_source),
+                            backgroundColor : _back_colors.slice(0, Object.values(_data_source).length),
+                        }
+                    ]
+                };
+                break;
+        }
+
+
+        let chartOptions = chartType !== 'doughnut' ? {
+            maintainAspectRatio: false,
+            responsive: true,
+            legend: {
+                display: false
+            },
+            scales: {
+                xAxes: [{
+                    gridLines: {
+                        display: false,
+                    }
+                }],
+                yAxes: [{
+                    gridLines: {
+                        display: true,
+                    },
+                    ticks: {
+                        precision: 0
+                    }
+                }],
+            }
+
+        } : {
+            maintainAspectRatio: false,
+            responsive: true,
+        };
+
+        // This will get the first returned node in the jQuery collection.
+        new Chart(chartCanvas, {
+            type:  chartType,
+            data: chartData,
+            options: chartOptions
+        })
     })
 
 </script>
