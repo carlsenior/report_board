@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
            PaymentMethodSeeder::class,
            CategorySeeder::class,
-            CustomerSeeder::class
+           CustomerSeeder::class
         ]);
     }
 }

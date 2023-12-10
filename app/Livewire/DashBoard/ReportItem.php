@@ -7,8 +7,8 @@ use Livewire\Component;
 class ReportItem extends Component
 {
 
-    public object $this_data;
-    public object $last_data;
+    public array $this_data;
+    public array $last_data;
 
     public function render()
     {

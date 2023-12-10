@@ -25,7 +25,13 @@ class OrderItem extends Model
         return $this->belongsTo(Product::class, 'product_id');
     }
 
-    public function category() {
-        return $this->hasOneThrough(Customer::class, Product::class, 'customer_id', 'product_id');
+    public function category(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    {
+        return $this->hasOneThrough(Category::class, Product::class, 'id', 'id', 'product_id', 'category_id');
+    }
+
+    public function owner(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    {
+        return $this->hasOneThrough(Customer::class, Order::class, 'id', 'id', 'order_id', 'customer_id');
     }
 }

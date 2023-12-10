@@ -24,6 +24,7 @@
                     </tr>
                     </thead>
                     <tbody>
+
                     @forelse($datasource[0] as $index => $data)
                         <livewire:dash-board.report-item :this_data="$data" :last_data="$datasource[1][$index]" :key="$index"/>
                     @empty

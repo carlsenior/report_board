@@ -20,27 +20,26 @@ class CustomerSeeder extends Seeder
         $categories = Category::all()->pluck('id')->toArray();
         $payments = PaymentMethod::all()->pluck('id')->toArray();
         $products = Product::select('id', 'price')->get()->toArray();
-        Customer::factory()->count(148)->create()->each(function ($customer) use ($products, $categories, $payments) {
+        Customer::factory()->count(438)->create()->each(function ($customer) use ($products, $categories, $payments) {
             $order_random_count = rand(1, 9);
             foreach (range(1, $order_random_count) as $index) {
                 $item_random_count = rand(1, 6);
-                Order::factory()->create([
+                $order = Order::factory()->create([
                     'customer_id' => $customer->id,
                     'payment_method' => fake()->randomElement($payments),
                     'created_at' => fake()->dateTimeBetween('-2 year', 'now'),
-                ])->each(function ($order) use ($products, $item_random_count, $categories) {
-                    foreach (range(1, $item_random_count) as $index) {
-                        $product = fake()->randomElement($products);
-                        OrderItem::factory()->create([
-                            'order_id' => $order->id,
-                            'product_id' => $product['id'],
-                            'price' => $product['price'],
-                            'quantity' => rand(1, 10),
-                            'discount' => rand(0, 15),
-                            'created_at' => $order->created_at,
-                        ]);
-                    }
-                });
+                ]);
+                foreach (range(1, $item_random_count) as $index) {
+                    $product = fake()->randomElement($products);
+                    OrderItem::factory()->create([
+                        'order_id' => $order->id,
+                        'product_id' => $product['id'],
+                        'price' => $product['price'],
+                        'quantity' => rand(1, 10),
+                        'discount' => rand(0, 15),
+                        'created_at' => $order->created_at,
+                    ]);
+                }
             }
         });
     }

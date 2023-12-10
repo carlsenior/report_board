@@ -3,50 +3,120 @@
 namespace App\Livewire\DashBoard\Chart;
 
 use App\Models\Category;
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Carbon\Carbon;
+use http\Params;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\On;
 use Livewire\Component;
+use PHPUnit\Util\Filter;
+use function PHPUnit\Framework\stringContains;
 
 class ChartContainer extends Component
 {
-    private FilterType $filterType = FilterType::LAST30DAYS;
+//    private FilterType $filterType = FilterType::Last30Days;
+
     public array $dataSource = [];
 
-    public function mount() {
+    #[On('dofilter')]
+    public function dofilter($state) {
+        $_filter_type = FilterType::fromName($state['filter']);
+        $_selected_categories = $state['categories'];
+        $_selected_products = $state['products'];
 
-        # initial end date is today
-        $endDate = Carbon::now()->format('Y-m-d');
-        $last_endDate = Carbon::now()->subYear(1)->format('Y-m-d');
-        # initial start date is 29 days ago
-        $startDate = Carbon::now()->subDay(29)->format('Y-m-d');
-        $last_startDate = Carbon::now()->subYear(1)->subDay(29)->format('Y-m-d');
-
-        # this is the data source of the barchart - sales
-        $this_year_profit = $this->getTotalProfitByOrderItems($startDate, $endDate);
-        $last_year_profit = $this->getTotalProfitByOrderItems($last_startDate, $last_endDate);
-        $this->dataSource['sales'] = $this->getDataSource($this_year_profit, $last_year_profit);
-
-        # this is the data source of the area chart - visitors
-        $this_year_visitors = $this->getVistorsByOrders($startDate, $endDate);
-        $last_year_visitors = $this->getVistorsByOrders($last_startDate, $last_endDate);
-
-        $this->dataSource['visitors'] = $this->getDataSource($this_year_visitors, $last_year_visitors);
-
-        # this is the data source of the donut chart - filter by category
-        $this->dataSource['categories'] =  $this->getProfitByCategory($startDate, $endDate);
-
-        # this is the data source of the report
-        $this_year_per_product = $this->getReportData($startDate, $endDate);
-        $last_year_per_product = $this->getReportData($last_startDate, $last_endDate);
-        $this->dataSource['report'] = [$this_year_per_product, $last_year_per_product];
+        $this->dataSource = $this->getDataSourceFromDB($_filter_type, $_selected_categories, $_selected_products);
+        $this->dispatch('content_changed');
     }
 
-    private function getDataSource($this_year_data, $last_year_data): array {
+    private function getDataSourceFromDB($filter_type, $categories=[], $products=[], $start_date=null, $end_date=null, $last_start_date=null, $last_end_date=null): array
+    {
+        $startDate = null;
+        $endDate = null;
+        $last_startDate = null;
+        $last_endDate = null;
+        $data_source = [];
+
+        switch ($filter_type) {
+            case FilterType::Today:
+                $startDate = Carbon::now()->format('Y-m-d');
+                $endDate = Carbon::now()->format('Y-m-d');
+                $last_startDate = Carbon::now()->subYear(1)->format('Y-m-d');
+                $last_endDate = Carbon::now()->subYear(1)->format('Y-m-d');
+                break;
+            case FilterType::Yesterday:
+                $startDate = Carbon::now()->subDay(1)->format('Y-m-d');
+                $endDate = Carbon::now()->subDay(1)->format('Y-m-d');
+                $last_startDate = Carbon::now()->subYear(1)->subDay(1)->format('Y-m-d');
+                $last_endDate = Carbon::now()->subYear(1)->subDay(1)->format('Y-m-d');
+                break;
+            case FilterType::Last7Days:
+                $startDate = Carbon::now()->subDay(6)->format('Y-m-d');
+                $endDate = Carbon::now()->format('Y-m-d');
+                $last_startDate = Carbon::now()->subYear(1)->subDay(6)->format('Y-m-d');
+                $last_endDate = Carbon::now()->subYear(1)->format('Y-m-d');
+                break;
+            case FilterType::Last30Days:
+                $startDate = Carbon::now()->subDay(29)->format('Y-m-d');
+                $endDate = Carbon::now()->format('Y-m-d');
+                $last_startDate = Carbon::now()->subYear(1)->subDay(29)->format('Y-m-d');
+                $last_endDate = Carbon::now()->subYear(1)->format('Y-m-d');
+                break;
+            case FilterType::ThisMonth:
+                $startDate = Carbon::now()->startOfMonth()->format('Y-m-d');
+                $endDate = Carbon::now()->format('Y-m-d');
+                $last_startDate = Carbon::now()->subYear(1)->startOfMonth()->format('Y-m-d');
+                $last_endDate = Carbon::now()->subYear(1)->format('Y-m-d');
+                break;
+            case FilterType::LastMonth:
+                $startDate = Carbon::now()->subMonth()->startOfMonth()->format('Y-m-d');
+                $endDate = Carbon::now()->subMonth()->endOfMonth()->format('Y-m-d');
+                $last_startDate = Carbon::now()->subYear(1)->subMonth(1)->startOfMonth()->format('Y-m-d');
+                $last_endDate = Carbon::now()->subYear(1)->subMonth(1)->endOfMonth()->format('Y-m-d');
+                break;
+            case FilterType::Custom:
+                $startDate = $start_date;
+                $endDate = $end_date;
+                $last_startDate = $last_start_date;
+                $last_endDate = $last_end_date;
+                break;
+            default:
+                $startDate = Carbon::now()->subDay(29)->format('Y-m-d');
+                $endDate = Carbon::now()->format('Y-m-d');
+                $last_startDate = Carbon::now()->subYear(1)->subDay(29)->format('Y-m-d');
+                $last_endDate = Carbon::now()->subYear(1)->format('Y-m-d');
+        }
+
+        # this is the data source of the barchart - sales
+        $this_year_profit = $this->getTotalProfitByOrderItems($startDate, $endDate, $categories, $products);
+        $last_year_profit = $this->getTotalProfitByOrderItems($last_startDate, $last_endDate, $categories, $products);
+        $data_source['sales'] = $this->getDataSource($this_year_profit, $last_year_profit, $filter_type);
+
+        # this is the data source of the area chart - visitors
+        $this_year_visitors = $this->getVistorsByOrders($startDate, $endDate, $categories, $products);
+        $last_year_visitors = $this->getVistorsByOrders($last_startDate, $last_endDate, $categories, $products);
+
+        $data_source['visitors'] = $this->getDataSource($this_year_visitors, $last_year_visitors, $filter_type);
+
+        # this is the data source of the donut chart - filter by category
+        $data_source['categories'] =  $this->getProfitByCategory($startDate, $endDate, $categories);
+        # this is the data source of the report
+        $this_year_per_product = $this->getReportData($startDate, $endDate, $categories, $products);
+        $last_year_per_product = $this->getReportData($last_startDate, $last_endDate, $categories, $products);
+        $data_source['report'] = [$this_year_per_product, $last_year_per_product];
+        return $data_source;
+    }
+
+    public function mount() {
+        $this->dataSource = $this->getDataSourceFromDB(FilterType::Last30Days);
+    }
+
+    private function getDataSource($this_year_data, $last_year_data, $filter_type): array {
         # fill blank
-        $this_year_data = $this->fillBlank($this_year_data, $this->filterType, 0);
-        $last_year_data = $this->fillBlank($last_year_data, $this->filterType, -1);
+        $this_year_data = $this->fillBlank($this_year_data, $filter_type, 0);
+        $last_year_data = $this->fillBlank($last_year_data, $filter_type, -1);
 
         # sort
         ksort($this_year_data);
@@ -65,9 +135,7 @@ class ChartContainer extends Component
 
     public function render()
     {
-        return view('livewire.pages.dashboard.chart-container')->with([
-            'dataSource' => $this->dataSource
-        ]);
+        return view('livewire.pages.dashboard.chart-container');
     }
 
     /**
@@ -75,15 +143,28 @@ class ChartContainer extends Component
      * @param string $endDate
      * @return mixed
      */
-    public function getTotalProfitByOrderItems(string $startDate, string $endDate): mixed
+    public function getTotalProfitByOrderItems(string $startDate, string $endDate, array $categories, array $products): mixed
     {
-        return OrderItem::whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d") as created, SUM(quantity * price * (100-discount)/100) as order_item_total_price')
+        return OrderItem::WhereBetween('created_at', [$startDate, $endDate])->whereHas('product', function ($p_query) use ($categories, $products) {
+            if (count($categories) == 0 && count($products) == 0) {
+                return $p_query;
+            } else if (count($categories) > 0 && count($products) == 0) {
+                return $p_query->whereIn('category_id', $categories);
+            } else if (count($categories) == 0 && count($products) > 0) {
+                return $p_query->whereIn('id', $products);
+            } else {
+                return $p_query->whereIn('category_id', $categories)->whereIn('id', $products);
+            }
+        })->selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d") as created, Round(Sum(price*(1-discount/100)*quantity),2) as item_total')
             ->groupBy('created')
-            ->orderBy('created')
+            ->orderBy('created', 'asc')
             ->get()
-            ->pluck('order_item_total_price', 'created')
+            ->pluck('item_total', 'created')
             ->toArray();
+    }
+
+    private function getImplodedData(array $data): string {
+        return implode(",", $data);
     }
 
     /**
@@ -95,24 +176,24 @@ class ChartContainer extends Component
         $start = 0;
         $end = 0;
         switch ($filterType) {
-            case FilterType::TODAY:
+            case FilterType::Today:
                 break;
-            case FilterType::YESTERDAY:
+            case FilterType::Yesterday:
                 $start = $end = 1;
                 break;
-            case FilterType::LAST7DAYS:
+            case FilterType::Last7Days:
                 $end = 6;
                 break;
-            case FilterType::LAST30DAYS:
+            case FilterType::Last30Days:
                 $end = 29;
                 break;
-            case FilterType::THIS_MONTH:
+            case FilterType::ThisMonth:
                 $end = Carbon::now()->startOfMonth()->diffInDays(Carbon::now()) - 1;
                 break;
-            case FilterType::LAST_MONTH:
+            case FilterType::LastMonth:
                 $end = 1;
                 break;
-            case FilterType::CUSTOM:
+            case FilterType::Custom:
                 $end = 1;
         }
         foreach (range($start, $end) as $index) {
@@ -129,15 +210,25 @@ class ChartContainer extends Component
         }, $data_array);
     }
 
-    private function getVistorsByOrders(string $startDate, string $endDate)
+    private function getVistorsByOrders(string $startDate, string $endDate, array $categories, array $products): array
     {
-         return Order::whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d") as created, COUNT(*) as count')
+        return OrderItem::whereBetween('created_at', [$startDate, $endDate])->whereHas('product', function ($p_query) use ($categories, $products) {
+            if (count($categories) == 0 && count($products) == 0) {
+                return $p_query;
+            } else if (count($categories) > 0 && count($products) == 0) {
+                return $p_query->whereIn('category_id', $categories);
+            } else if (count($categories) == 0 && count($products) > 0) {
+                return $p_query->whereIn('id', $products);
+            } else {
+                return $p_query->whereIn('category_id', $categories)->whereIn('id', $products);
+            }
+        })->with('owner')
+            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d") as created, COUNT(*) as visitors')
             ->groupBy('created')
-            ->orderBy('created')
+            ->orderBy('created', 'asc')
             ->get()
-            ->pluck('count', 'created')
-            ->toarray();
+            ->pluck('visitors', 'created')
+            ->toArray();
     }
 
     /**
@@ -151,24 +242,46 @@ class ChartContainer extends Component
         });
     }
 
-    private function getProfitByCategory(string $startDate, string $endDate): mixed
+    private function getProfitByCategory(string $startDate, string $endDate, array $categories): array
     {
-        return collect(DB::select("SELECT ROUND(SUM(citems.item_total),2) as total, `name` FROM (SELECT pitems.p_id, pitems.order_item_total_price as item_total, pitems.created, pitems.category_id FROM (SELECT * FROM (SELECT product_id AS p_id, DATE_FORMAT(created_at, '%Y-%m-%d') as created, quantity * price * (100-discount)/100 as order_item_total_price
-            from `order_items` where `created_at` between ? and ?) as items
-            left join products on items.p_id = products.id) as pitems) as citems
-            left join categories on categories.id = citems.category_id
-            GROUP BY name;
-            ", [$startDate, $endDate]))
-            ->pluck('total', 'name')
-            ->toArray();
+        return OrderItem::whereBetween('created_at', [$startDate, $endDate])->whereHas('product', function ($p_query) use ($categories) {
+            if (count($categories) == 0) {
+                return $p_query;
+            } else {
+                return $p_query->whereIn('category_id', $categories);
+            }
+        })
+            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d") as created, price*(1-discount/100)*quantity as item_total, product_id')
+            ->with('category')
+            ->get()
+            ->groupBy('category.name')
+            ->map(function ($item) {
+                return $item->sum('item_total');
+            })->toArray();
     }
 
-    private function getReportData(string $startDate, string $endDate)
+    private function getReportData(string $startDate, string $endDate, array $categories, array $products): array
     {
-        return DB::select("SELECT sum(items.quantity) as quantities, sum(items.item_total) as sales, products.`name` as `name`, MAX(products.price) as price from (SELECT product_id, quantity, quantity * price * (100-discount)/100 as item_total, DATE_FORMAT(created_at, '%Y-%m-%d') as created
-            from order_items
-            WHERE created_at BETWEEN ? and ?) as items
-            JOIN products on products.id = items.product_id
-            GROUP BY `name`;", [$startDate, $endDate]);
+        return array_values(OrderItem::whereBetween('created_at', [$startDate, $endDate])->whereHas('product', function ($p_query) use ($categories, $products) {
+            if (count($categories) == 0 && count($products) == 0) {
+                return $p_query;
+            } else if (count($categories) > 0 && count($products) == 0) {
+                return $p_query->whereIn('category_id', $categories);
+            } else if (count($categories) == 0 && count($products) > 0) {
+                return $p_query->whereIn('id', $products);
+            } else {
+                return $p_query->whereIn('category_id', $categories)->whereIn('id', $products);
+            }
+        })->selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d") as created, price*(1-discount/100)*quantity as item_sales, product_id, quantity')
+            ->with('product')
+            ->get()
+            ->groupBy('product.name')->map(function ($item) {
+                return [
+                    'name' => $item->first()->product->name,
+                    'sales' => round($item->sum('item_sales'), 2),
+                    'quantity' => $item->sum('quantity'),
+                    'price' => $item->first()->product->price
+                ];
+            })->toArray());
     }
 }
