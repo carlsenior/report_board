@@ -16,21 +16,13 @@
             </li>
 
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{{ route('profile') }}" class="nav-link" wire:navigate>
                     <i class="nav-icon fas fa-circle nav-icon"></i>
                     <p>
-                        Two-level menu
-                        <i class="fas fa-angle-left right"></i>
+                        Profile
+{{--                        <i class="fas fa-angle-left right"></i>--}}
                     </p>
                 </a>
-                <ul class="nav nav-treeview" style="display: none;">
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="far fa-circle nav-icon"></i>
-                            <p>Child menu</p>
-                        </a>
-                    </li>
-                </ul>
             </li>
         </ul>
     </nav>
