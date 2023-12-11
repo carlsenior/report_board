@@ -2,9 +2,6 @@
 
 namespace App\Livewire\DashBoard\Chart;
 
-use Illuminate\Support\Facades\Log;
-use Livewire\Attributes\Modelable;
-use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
 class Chart extends Component

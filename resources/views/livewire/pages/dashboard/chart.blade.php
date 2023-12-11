@@ -106,9 +106,6 @@
         let _data_source = @js($datasource);
         const _back_colors = ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#6200EE', '#03DAC6', '#d2d6de'];
 
-        const _month_name = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
-            'October', 'November', 'December'];
-
         const chartCanvas = $('#chart_{{ $type }}').get(0).getContext('2d');
         const chartType = _chat_type === 'area' ? 'line' : _chat_type;
 

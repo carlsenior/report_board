@@ -3,24 +3,24 @@
 namespace App\Livewire\DashBoard\Chart;
 
 use App\Models\Category;
-use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Product;
 use Carbon\Carbon;
-use http\Params;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use PHPUnit\Util\Filter;
-use function PHPUnit\Framework\stringContains;
 
 class ChartContainer extends Component
 {
-//    private FilterType $filterType = FilterType::Last30Days;
-
     public array $dataSource = [];
+
+    #[On('requestSales')]
+    public function requestSales() {
+        $start_date = Carbon::now()->startOfYear()->format('Y-m-d');
+        $end_date = Carbon::now()->endOfYear()->format('Y-m-d');
+        $saleOfYear = $this->getSalesThieYear($start_date, $end_date);
+        $this->dispatch('create_pdf', $saleOfYear);
+    }
 
     #[On('dofilter')]
     public function dofilter($state) {
@@ -32,8 +32,6 @@ class ChartContainer extends Component
         } else {
             $this->dataSource = $this->getDataSourceFromDB($_filter_type, $_selected_categories, $_selected_products);
         }
-
-        $this->dispatch('content_changed', $this->dataSource);
     }
 
     private function getDataSourceFromDB($filter_type, $categories=[], $products=[], $start_date=null, $end_date=null): array
@@ -292,5 +290,16 @@ class ChartContainer extends Component
                     'price' => $item->first()->product->price
                 ];
             })->toArray());
+    }
+
+    private function getSalesThieYear(string $start_date, string $end_date)
+    {
+        return DB::table('order_items')->whereBetWeen('order_items.created_at', [$start_date, $end_date])
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->selectRaw('MAX(DATE_FORMAT(order_items.created_at, "%Y-%m-%d")) as created, MAX(categories.name) as cname, MAX(products.name) as pname, SUM(order_items.price*(1-order_items.discount/100)*order_items.quantity) as total, ROUND(SUM(order_items.quantity),2) as quantities, MAX(order_items.price) as price')
+            ->groupBy('categories.name', 'products.name')
+            ->get()
+            ->groupBy('cname');
     }
 }

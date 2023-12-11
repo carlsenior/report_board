@@ -3,7 +3,6 @@
 namespace App\Livewire\DashBoard;
 
 use App\Models\Category;
-use Livewire\Attributes\On;
 use Livewire\Component;
 
 class FilterController extends Component
