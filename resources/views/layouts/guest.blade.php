@@ -7,6 +7,8 @@
 
         <title>{{ isset($title) ? $title : config('app.name', 'AdminLTE 3')  }}</title>
 
+        <link rel="icon" href="{{ url('favicon.ico') }}">
+
         <!-- Fonts -->
         <!-- Google Font: Source Sans Pro -->
         <link rel="stylesheet"
