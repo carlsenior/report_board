@@ -33,7 +33,9 @@ new #[Layout('layouts.guest'), \Livewire\Attributes\Title('Register')] class ext
 
         Auth::login($user);
 
-        $this->redirect(RouteServiceProvider::HOME, navigate: true);
+        $this->redirect(RouteServiceProvider::HOME,
+//            navigate: true
+        );
     }
 }; ?>
 

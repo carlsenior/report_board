@@ -24,7 +24,7 @@ new #[Layout('layouts.guest'), \Livewire\Attributes\Title('Login')] class extend
 
         $this->redirect(
             session('url.intended', RouteServiceProvider::HOME),
-            navigate: true
+//            navigate: true
         );
     }
 }; ?>
